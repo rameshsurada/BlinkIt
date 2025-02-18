@@ -1,14 +1,14 @@
 import React from "react";
 import Search from "./Search";
 import logo from "../assets/blinkItLogo.webp";
-
+import { Link } from "react-router-dom";
 const Header = () => {
   return (
     <header className="h-20 shadow-md sticky top-0">
       <div className="container mx-auto flex items-center h-full  px-2 justify-between">
         {/* logo */}
         <div className="h-full">
-          <div className="h-full flex justify-center items-center ">
+          <Link to={"/"} className="h-full flex justify-center items-center ">
             <img
               src={logo}
               width={120}
@@ -23,7 +23,7 @@ const Header = () => {
               alt="logo"
               className=" hidden lg:block"
             />
-          </div>
+          </Link>
         </div>
 
         {/* search */}
