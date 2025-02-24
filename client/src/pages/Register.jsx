@@ -1,6 +1,13 @@
 import React, { useState } from "react";
 import { FaEyeSlash } from "react-icons/fa";
 import { FaEye } from "react-icons/fa";
+import toast, { Toaster } from "react-hot-toast";
+import axios from "axios";
+import Axios from "../utils/Axios";
+import SummaryApi from "../common/SummaryApi";
+import AxiosToastError from "../utils/AxiosToastError";
+import { useNavigate, Link } from "react-router-dom";
+import Login from "./Login";
 
 const Register = () => {
   const [data, setData] = useState({
@@ -12,7 +19,7 @@ const Register = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(data);
+
     setData((prev) => {
       return {
         ...prev,
@@ -20,20 +27,47 @@ const Register = () => {
       };
     });
   };
-  console.log("data : ", data);
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const navigate = useNavigate();
 
   const handlePasswordShow = (e) => {
     setShowPassword((pre) => !pre);
     setShowConfirmPassword((pre) => !pre);
   };
 
-  const checkValues = Object.values(data).every((e1) => e1);
+  const validValue = Object.values(data).every((e1) => e1);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (data.password !== data.confirmPassword) {
+      toast.error("password and confirm password must be same");
+      return;
+    }
+    ///have a look at this code...
+
+    // const response = await Axios({
+    //   ...SummaryApi.register
+    // });
+
+    try {
+      const response = await Axios({ ...SummaryApi.register, data });
+      console.log("response", response);
+      if (response.data.error) {
+        toast.error(response.data.message);
+      }
+      if (response.data.success) {
+        toast.success(response.data.message);
+
+        setData({ name: "", email: "", password: "", confirmPassword: "" });
+        navigate("/login");
+      }
+      console.log(response.data.success);
+    } catch (error) {
+      AxiosToastError(error);
+    }
   };
   return (
     <section className="w-full container mx-auto px-2">
@@ -61,7 +95,7 @@ const Register = () => {
             <br></br>
             <input
               id="email"
-              type="text"
+              type="mail"
               className="bg-blue-50 p-2 w-full outline-none"
               name="email"
               value={data.email}
@@ -125,13 +159,24 @@ const Register = () => {
           </div>
 
           <button
+            disabled={!validValue}
             className={` ${
-              checkValues ? "bg-green-800 hover:bg-green-700" : "bg-gray-500"
+              validValue ? "bg-green-800 hover:bg-green-700" : "bg-gray-500"
             }  text-white w-full py-2 my-5 rounded font-semibold`}
           >
             Register
           </button>
         </form>
+        <p>
+          {" "}
+          Already have account ?{" "}
+          <Link
+            to={"/login"}
+            className="font-semibold text-green-700 hover:text-green-800"
+          >
+            Login
+          </Link>
+        </p>
       </div>
     </section>
   );
